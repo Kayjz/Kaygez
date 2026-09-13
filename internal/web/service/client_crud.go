@@ -523,6 +523,12 @@ func (s *ClientService) Update(inboundSvc *InboundService, id int, updated model
 
 	if err := database.GetDB().Model(&model.ClientRecord{}).
 		Where("id = ?", id).
+		UpdateColumn("usage_multiplier", updated.UsageMultiplier).Error; err != nil {
+		return needRestart, err
+	}
+
+	if err := database.GetDB().Model(&model.ClientRecord{}).
+		Where("id = ?", id).
 		UpdateColumn("updated_at", time.Now().UnixMilli()).Error; err != nil {
 		return needRestart, err
 	}

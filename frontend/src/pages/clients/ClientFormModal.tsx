@@ -566,6 +566,7 @@ export default function ClientFormModal({
       group: values.group,
       comment: values.comment,
       enable: !!values.enable,
+      usageMultiplier: Number(values.usageMultiplier) || 1,
     };
     const reverseTagValue = showReverseTag
       ? (values.reverseTag || "").trim()

@@ -1068,6 +1068,7 @@ func (c *Client) ToRecord() *ClientRecord {
 		KeepAlive:    c.KeepAlive,
 		Secret:       c.Secret,
 		AdTag:        c.AdTag,
+		UsageMultiplier: c.UsageMultiplier,
 	}
 	if c.Reverse != nil {
 		if b, err := json.Marshal(c.Reverse); err == nil {
@@ -1123,6 +1124,7 @@ func (r *ClientRecord) ToClient() *Client {
 		KeepAlive:    r.KeepAlive,
 		Secret:       r.Secret,
 		AdTag:        r.AdTag,
+		UsageMultiplier: r.UsageMultiplier,
 	}
 	if r.Reverse != "" {
 		var rev ClientReverse
