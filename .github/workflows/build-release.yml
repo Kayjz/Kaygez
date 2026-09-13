@@ -3,7 +3,7 @@ name: Build and Release Kaygez
 on:
   push:
     tags:
-      - 'v*'
+      - "v*"
   workflow_dispatch:
 
 jobs:
@@ -16,12 +16,12 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: "1.22"
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22'
+          node-version: "22"
 
       - name: Build Frontend
         run: |
@@ -41,9 +41,12 @@ jobs:
         run: |
           mkdir -p x-ui
           cp x-ui-linux-amd64 x-ui/x-ui
-          cp -r bin x-ui/
+          chmod +x x-ui/x-ui
           cp x-ui.sh x-ui/
-          cp x-ui.service.* x-ui/ || true
+          chmod +x x-ui/x-ui.sh
+          cp x-ui.service.debian x-ui/ || true
+          cp x-ui.service.arch x-ui/ || true
+          cp x-ui.service.rhel x-ui/ || true
           tar -czf x-ui-linux-amd64.tar.gz x-ui
 
       - name: Package arm64
@@ -51,9 +54,12 @@ jobs:
           rm -rf x-ui
           mkdir -p x-ui
           cp x-ui-linux-arm64 x-ui/x-ui
-          cp -r bin x-ui/
+          chmod +x x-ui/x-ui
           cp x-ui.sh x-ui/
-          cp x-ui.service.* x-ui/ || true
+          chmod +x x-ui/x-ui.sh
+          cp x-ui.service.debian x-ui/ || true
+          cp x-ui.service.arch x-ui/ || true
+          cp x-ui.service.rhel x-ui/ || true
           tar -czf x-ui-linux-arm64.tar.gz x-ui
 
       - name: Create Release
