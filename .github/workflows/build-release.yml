@@ -86,8 +86,7 @@ jobs:
           chmod +x pkg/x-ui/x-ui pkg/x-ui/x-ui.sh
           tar -C pkg -czf x-ui-linux-${{ matrix.goarch }}.tar.gz x-ui
 
-      - name: Upload artifacts (manual trigger)
-        if: github.event_name == 'workflow_dispatch'
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: kaygez-binaries-${{ matrix.goarch }}
