@@ -9,7 +9,7 @@ import (
 
 const ClientInboundStatEmailPrefix = "hmstat"
 
-// ClientInboundStatEmail returns Heimdall's runtime-only Xray stats identity
+// ClientInboundStatEmail returns Kaygez's runtime-only Xray stats identity
 // for one logical client on one inbound.
 //
 // The DB/UI/subscription identity remains the logical email. Xray runtime sees

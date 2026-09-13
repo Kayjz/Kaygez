@@ -5,7 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"github.com/mhsanaei/3x-ui/v3/internal/database"
+	"github.com/Kayjz/Kaygez/v3/internal/database"
 	"html/template"
 	"math"
 	"net/http"
@@ -19,8 +19,8 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
+	"github.com/Kayjz/Kaygez/v3/internal/logger"
+	"github.com/Kayjz/Kaygez/v3/internal/web/service"
 )
 
 // writeSubError translates a service-layer result into an HTTP response.

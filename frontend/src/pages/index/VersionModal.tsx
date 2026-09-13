@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Alert, Button, Collapse, Modal, Tag, Tooltip } from 'antd';
+import { Button, Collapse, Modal, Select, Space, Tag, Tooltip } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 
 import { HttpUtil } from '@/utils';
@@ -34,6 +34,35 @@ export default function VersionModal({ open, status, onClose, onBusy }: VersionM
   const { t } = useTranslation();
   const [modal, modalContextHolder] = Modal.useModal();
   const [activeKey, setActiveKey] = useState<string | string[]>('1');
+  const [versions, setVersions] = useState<string[]>([]);
+  const [selectedVersion, setSelectedVersion] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (!open) return;
+    HttpUtil.get<string[]>('/panel/api/server/getXrayVersion').then((res) => {
+      if (res?.success && Array.isArray(res.obj)) {
+        setVersions(res.obj);
+      }
+    });
+  }, [open]);
+
+  function installXray(version: string) {
+    modal.confirm({
+      title: t('pages.index.xrayUpdates'),
+      content: t('pages.index.xraySwitchVersionPopover'),
+      okText: t('confirm'),
+      cancelText: t('cancel'),
+      onOk: async () => {
+        onClose();
+        onBusy({ busy: true, tip: t('pages.index.dontRefresh') });
+        try {
+          await HttpUtil.post(`/panel/api/server/installXray/${version}`);
+        } finally {
+          onBusy({ busy: false });
+        }
+      },
+    });
+  }
 
   function updateGeofile(fileName: string) {
     const isSingle = !!fileName;
@@ -83,18 +112,29 @@ export default function VersionModal({ open, status, onClose, onBusy }: VersionM
             label: 'Xray',
             children: (
               <>
-                <Alert
-                  type="info"
-                  className="mb-12"
-                  showIcon
-                  message="Heimdall Custom Xray Core is locked"
-                  description="Core switching from the panel is disabled to preserve Speed Limit, Upload/Download Limit, and Core-Level Connection Limit features."
-                />
                 <div className="version-list">
                   <div className="version-list-item">
                     <Tag color="green">Current Core</Tag>
                     <Tag color="purple">{currentXrayVersion}</Tag>
                   </div>
+                </div>
+                <div className="actions-row">
+                  <Space.Compact style={{ width: '100%' }}>
+                    <Select
+                      style={{ flex: 1 }}
+                      placeholder={t('pages.index.xrayVersion')}
+                      value={selectedVersion}
+                      onChange={setSelectedVersion}
+                      options={versions.map((v) => ({ value: v, label: v }))}
+                    />
+                    <Button
+                      type="primary"
+                      disabled={!selectedVersion}
+                      onClick={() => selectedVersion && installXray(selectedVersion)}
+                    >
+                      {t('update')}
+                    </Button>
+                  </Space.Compact>
                 </div>
               </>
             ),

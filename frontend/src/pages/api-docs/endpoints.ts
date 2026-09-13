@@ -360,7 +360,7 @@ export const sections: readonly Section[] = [
       {
         method: 'GET',
         path: '/panel/api/server/getPanelUpdateInfo',
-        summary: 'Check whether a newer HEIMDALL release is available on GitHub.',
+        summary: 'Check whether a newer Kaygez release is available on GitHub.',
       },
       {
         method: 'GET',
@@ -425,6 +425,16 @@ export const sections: readonly Section[] = [
         path: '/panel/api/server/getNewVlessEnc',
         summary: 'Generate VLESS encryption auth options. Returns an auths array each with id, label, encryption, and decryption fields.',
         response: '{\n  "success": true,\n  "obj": {\n    "auths": [\n      { "id": 0, "label": "Auth #0", "encryption": "aes-256-gcm", "decryption": "" }\n    ]\n  }\n}',
+      },
+      {
+        method: 'POST',
+        path: '/panel/api/server/installXray/:version',
+        summary: 'Download and install an official XTLS/Xray-core release as the panel core, then restart Xray. The version must be a vMAJOR.MINOR.PATCH tag.',
+        params: [
+          { name: 'version', in: 'path', type: 'string', desc: 'Release tag to install (e.g. v26.6.22).' },
+        ],
+        errorResponse:
+          '{\n  "success": false,\n  "msg": "invalid Xray version ..."\n}',
       },
       {
         method: 'POST',
@@ -1058,7 +1068,7 @@ export const sections: readonly Section[] = [
     title: 'Admins',
     auth: 'cookie-only',
     description:
-      'Manage Heimdall panel administrator accounts from an active browser session. Bearer API tokens are rejected. Access follows administrator RBAC permissions, and password hashes are never returned.',
+      'Manage Kaygez panel administrator accounts from an active browser session. Bearer API tokens are rejected. Access follows administrator RBAC permissions, and password hashes are never returned.',
     endpoints: [
       {
         method: 'GET',
@@ -1178,7 +1188,7 @@ export const sections: readonly Section[] = [
     title: 'Admin Roles',
     auth: 'cookie-only',
     description:
-      'Manage Heimdall dashboard roles and RBAC presets from an active browser session. Bearer API tokens are rejected. Access follows role-management RBAC permissions; built-in and owner roles retain their backend protections.',
+      'Manage Kaygez dashboard roles and RBAC presets from an active browser session. Bearer API tokens are rejected. Access follows role-management RBAC permissions; built-in and owner roles retain their backend protections.',
     endpoints: [
       {
         method: 'GET',
@@ -1238,7 +1248,7 @@ export const sections: readonly Section[] = [
     id: 'nodes',
     title: 'Nodes',
     description:
-      'Manage remote HEIMDALL panels acting as nodes for a central panel. All endpoints under /panel/api/nodes.',
+      'Manage remote Kaygez panels acting as nodes for a central panel. All endpoints under /panel/api/nodes.',
     endpoints: [
       {
         method: 'GET',
@@ -1512,7 +1522,7 @@ export const sections: readonly Section[] = [
       {
         method: 'POST',
         path: '/panel/api/setting/restartPanel',
-        summary: 'Restart the entire HEIMDALL process after a 3-second grace period. The connection drops immediately; the panel comes back online ~5-10 seconds later.',
+        summary: 'Restart the entire Kaygez process after a 3-second grace period. The connection drops immediately; the panel comes back online ~5-10 seconds later.',
       },
       {
         method: 'POST',

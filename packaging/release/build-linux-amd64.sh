@@ -17,11 +17,11 @@ VERSION="$(
         < "$REPO_ROOT/internal/config/version"
 )"
 
-CUSTOM_XRAY="${HEIMDALL_CUSTOM_XRAY:-}"
-EXPECTED_CUSTOM_XRAY_SHA256="${HEIMDALL_CUSTOM_XRAY_SHA256:-}"
-EXPECTED_PANEL_SHA256="${HEIMDALL_EXPECTED_PANEL_SHA256:-}"
-RUNTIME_BIN_DIR="${HEIMDALL_RUNTIME_BIN_DIR:-/usr/local/x-ui/bin}"
-OUTPUT_DIR="${HEIMDALL_RELEASE_OUTPUT_DIR:-$REPO_ROOT/release-out}"
+CUSTOM_XRAY="${KAYGEZ_CUSTOM_XRAY:-${HEIMDALL_CUSTOM_XRAY:-}}"
+EXPECTED_CUSTOM_XRAY_SHA256="${KAYGEZ_CUSTOM_XRAY_SHA256:-${HEIMDALL_CUSTOM_XRAY_SHA256:-}}"
+RUNTIME_BIN_DIR="${KAYGEZ_RUNTIME_BIN_DIR:-${HEIMDALL_RUNTIME_BIN_DIR:-/usr/local/x-ui/bin}}"
+OUTPUT_DIR="${KAYGEZ_RELEASE_OUTPUT_DIR:-${HEIMDALL_RELEASE_OUTPUT_DIR:-$REPO_ROOT/release-out}}"
+XRAY_RELEASE_TAG="${KAYGEZ_XRAY_RELEASE_TAG:-v26.6.22}"
 
 fail() {
     printf '\nERROR: %s\n' "$*" >&2
@@ -40,17 +40,32 @@ do
     need "$tool"
 done
 
-test "$VERSION" = "1.5.0" ||
-    fail "release version must be 1.5.0, got: $VERSION"
+test "$VERSION" = "1.0.0" ||
+    fail "release version must be 1.0.0, got: $VERSION"
 
-test -n "$CUSTOM_XRAY" ||
-    fail "HEIMDALL_CUSTOM_XRAY is required"
+if [ -z "$CUSTOM_XRAY" ]; then
+    need curl
+    need unzip
+    TMP_DIR="$(mktemp -d)"
+    trap 'rm -rf "$TMP_DIR"' EXIT
+    XRAY_BASE_URL="https://github.com/XTLS/Xray-core/releases/download/${XRAY_RELEASE_TAG}/Xray-linux-64.zip"
+    curl -fL --retry 5 --retry-delay 3 -o "$TMP_DIR/xray.zip" "$XRAY_BASE_URL"
+    curl -fL --retry 5 --retry-delay 3 -o "$TMP_DIR/xray.zip.dgst" "$XRAY_BASE_URL.dgst"
+    EXPECTED_CUSTOM_XRAY_SHA256="$(
+        grep -i '^SHA2-256=' "$TMP_DIR/xray.zip.dgst" |
+        head -n1 |
+        cut -d= -f2 |
+        tr -d '[:space:]'
+    )"
+    test -n "$EXPECTED_CUSTOM_XRAY_SHA256" ||
+        fail "could not read Xray release SHA-256 from .dgst"
+    unzip -o -j "$TMP_DIR/xray.zip" -d "$TMP_DIR" >/dev/null
+    chmod +x "$TMP_DIR/xray"
+    CUSTOM_XRAY="$TMP_DIR/xray"
+fi
 
 test -f "$CUSTOM_XRAY" ||
-    fail "custom Xray file not found: $CUSTOM_XRAY"
-
-test -n "$EXPECTED_CUSTOM_XRAY_SHA256" ||
-    fail "HEIMDALL_CUSTOM_XRAY_SHA256 is required"
+    fail "Xray binary file not found: $CUSTOM_XRAY"
 
 ACTUAL_CUSTOM_XRAY_SHA256="$(
     sha256sum "$CUSTOM_XRAY" |
@@ -58,10 +73,7 @@ ACTUAL_CUSTOM_XRAY_SHA256="$(
 )"
 
 test "$ACTUAL_CUSTOM_XRAY_SHA256" = "$EXPECTED_CUSTOM_XRAY_SHA256" ||
-    fail "custom Xray SHA256 mismatch"
-
-test -n "$EXPECTED_PANEL_SHA256" ||
-    fail "HEIMDALL_EXPECTED_PANEL_SHA256 is required"
+    fail "Xray binary SHA256 mismatch"
 
 SOURCE_HEAD="$(git -C "$REPO_ROOT" rev-parse HEAD)"
 SOURCE_TREE="$(git -C "$REPO_ROOT" rev-parse HEAD^{tree})"
@@ -106,7 +118,6 @@ printf 'SOURCE_DATE_EPOCH=%s\n' "$SOURCE_DATE_EPOCH"
 printf 'BUILD_DATE=%s\n' "$BUILD_DATE"
 printf 'CUSTOM_XRAY=%s\n' "$CUSTOM_XRAY"
 printf 'CUSTOM_XRAY_SHA256=%s\n' "$ACTUAL_CUSTOM_XRAY_SHA256"
-printf 'EXPECTED_PANEL_SHA256=%s\n' "$EXPECTED_PANEL_SHA256"
 printf 'RUNTIME_BIN_DIR=%s\n' "$RUNTIME_BIN_DIR"
 printf 'OUTPUT_DIR=%s\n' "$OUTPUT_DIR"
 
@@ -154,7 +165,7 @@ PANEL_BINARY="$WORK/x-ui"
         -buildvcs=false \
         -ldflags='-s -w' \
         -o "$PANEL_BINARY" \
-        github.com/mhsanaei/3x-ui/v3
+        github.com/Kayjz/Kaygez/v3
 )
 
 test -s "$PANEL_BINARY" ||
@@ -167,11 +178,7 @@ PANEL_SHA256="$(
     awk '{print $1}'
 )"
 
-test "$PANEL_SHA256" = "$EXPECTED_PANEL_SHA256" ||
-    fail "release panel SHA256 does not match validated live panel"
-
 printf 'PANEL_SHA256=%s\n' "$PANEL_SHA256"
-printf 'PANEL_LIVE_PARITY=yes\n'
 
 printf '\n===== ASSEMBLE RELEASE PAYLOAD =====\n'
 
@@ -265,7 +272,6 @@ SOURCE_TREE=$SOURCE_TREE
 SOURCE_DATE_EPOCH=$SOURCE_DATE_EPOCH
 BUILD_DATE=$BUILD_DATE
 ARCH=linux-amd64
-PANEL_BUILD_RECIPE=validated-live-parity
 PANEL_SHA256=$PANEL_SHA256
 CUSTOM_XRAY_SHA256=$ACTUAL_CUSTOM_XRAY_SHA256
 MANIFEST
@@ -433,15 +439,12 @@ printf 'RELEASE_VERSION=%s\n' "$VERSION"
 printf 'RELEASE_ARCH=linux-amd64\n'
 printf 'SOURCE_HEAD=%s\n' "$SOURCE_HEAD"
 printf 'SOURCE_TREE=%s\n' "$SOURCE_TREE"
-printf 'PANEL_BUILD_RECIPE=validated-live-parity\n'
-printf 'PANEL_LIVE_PARITY=yes\n'
 printf 'PANEL_SHA256=%s\n' "$PANEL_SHA256"
 printf 'CUSTOM_XRAY_SHA256=%s\n' "$VERIFIED_CUSTOM_XRAY_SHA256"
 printf 'CUSTOM_XRAY_MATCH=yes\n'
 printf 'OURENUS_HTML_SHA256=%s\n' "$ARCHIVE_OURENUS_HTML_SHA256"
 printf 'OURENUS_PHP_SHA256=%s\n' "$ARCHIVE_OURENUS_PHP_SHA256"
 printf 'OURENUS_MATCH=yes\n'
-printf 'OFFICIAL_XRAY_DOWNLOADED=no\n'
 printf 'ARCHIVE_VERIFIED=yes\n'
 printf 'ARCHIVE=%s\n' "$ARCHIVE"
 printf 'ARCHIVE_SHA_FILE=%s\n' "$ARCHIVE_SHA_FILE"

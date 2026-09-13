@@ -28,9 +28,9 @@ type ThemeContextValue = {
   setRadius: (radius: number) => void;
 };
 
-const THEME_KEY = 'heimdall-ui-theme';
-const COLOR_THEME_KEY = 'heimdall-ui-color-theme';
-const RADIUS_KEY = 'heimdall-ui-radius';
+const THEME_KEY = 'kaygez-ui-theme';
+const COLOR_THEME_KEY = 'kaygez-ui-color-theme';
+const RADIUS_KEY = 'kaygez-ui-radius';
 
 const getSystemTheme = (): ResolvedTheme => {
   if (typeof window === 'undefined' || typeof window.matchMedia !== 'function') return 'light';

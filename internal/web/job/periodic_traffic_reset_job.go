@@ -1,8 +1,8 @@
 package job
 
 import (
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
+	"github.com/Kayjz/Kaygez/v3/internal/logger"
+	"github.com/Kayjz/Kaygez/v3/internal/web/service"
 )
 
 // Period represents the time period for traffic resets.

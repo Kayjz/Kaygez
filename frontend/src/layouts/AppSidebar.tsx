@@ -44,9 +44,9 @@ import { canAccessRoute, hasPermission } from '@/pg-ui/utils/rbac';
 import './AppSidebar.css';
 
 const SIDEBAR_COLLAPSED_KEY = 'isSidebarCollapsed';
-const DONATE_URL = 'https://reymit.ir/heimdall';
-const DOCS_URL = 'https://github.com/sh7CBAC/Heimdall#readme';
-const REPO_URL = 'https://github.com/sh7CBAC/Heimdall';
+const DONATE_URL = 'https://reymit.ir/kaygez';
+const DOCS_URL = 'https://github.com/Kayjz/Kaygez#readme';
+const REPO_URL = 'https://github.com/Kayjz/Kaygez';
 const LOGOUT_KEY = '__logout__';
 
 ensurePgAdminI18n();
@@ -297,7 +297,7 @@ export default function AppSidebar() {
       >
         <div className={`sider-brand${collapsed ? ' sider-brand-collapsed' : ''}`}>
           <div className="brand-block">
-            <span className="brand-text">{collapsed ? 'HDL' : 'HEIMDALL'}</span>
+            <span className="brand-text">{collapsed ? 'KZG' : 'KAYGEZ'}</span>
           </div>
           {!collapsed && (
             <div className="brand-actions">
@@ -351,7 +351,7 @@ export default function AppSidebar() {
       >
         <div className="drawer-header">
           <div className="brand-block">
-            <span className="drawer-brand">HEIMDALL</span>
+            <span className="drawer-brand">KAYGEZ</span>
           </div>
           <div className="drawer-header-actions">
             <DocsButton ariaLabel={t('menu.docs') || 'Documentation'} />

@@ -1,5 +1,5 @@
 <p align="center">
-  <img width="2172" height="724" alt="Heimdall README hero banner" src="bash <(curl -Ls https://raw.githubusercontent.com/EPxTeam/Heimdall/main/install.sh)" />
+  <img width="2172" height="724" alt="Kaygez README hero banner" src="bash <(curl -Ls https://raw.githubusercontent.com/Kayjz/Kaygez/main/install.sh)" />
 </p>
 
 ## ⚡ Quick Start

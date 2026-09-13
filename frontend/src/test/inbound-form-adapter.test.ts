@@ -316,10 +316,10 @@ describe('usageMultiplier', () => {
     expect(payload.usageMultiplier).toBe(2.5);
   });
 
-  it('usageMultiplier defaults to 1 and clamps to the supported range', () => {
+  it('usageMultiplier defaults to 1 with no upper cap', () => {
     expect(rawInboundToFormValues({ ...vlessRow, usageMultiplier: undefined }).usageMultiplier).toBe(1);
     expect(rawInboundToFormValues({ ...vlessRow, usageMultiplier: 0 }).usageMultiplier).toBe(1);
-    expect(rawInboundToFormValues({ ...vlessRow, usageMultiplier: 99 }).usageMultiplier).toBe(10);
+    expect(rawInboundToFormValues({ ...vlessRow, usageMultiplier: 99 }).usageMultiplier).toBe(99);
   });
 });
 

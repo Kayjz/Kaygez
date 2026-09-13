@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/common"
-	"github.com/mhsanaei/3x-ui/v3/internal/xray"
+	"github.com/Kayjz/Kaygez/v3/internal/database/model"
+	"github.com/Kayjz/Kaygez/v3/internal/util/common"
+	"github.com/Kayjz/Kaygez/v3/internal/xray"
 )
 
 // remarkContext carries the per-client data a remark template can interpolate.
@@ -150,9 +150,6 @@ func formatRemarkFactor(ctx remarkContext) string {
 	}
 	if v < 1 {
 		v = 1
-	}
-	if v > 10 {
-		v = 10
 	}
 	if v == float64(int64(v)) {
 		return fmt.Sprintf("%dx", int64(v))

@@ -4,10 +4,10 @@ import (
 	"context"
 	"strings"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/runtime"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
+	"github.com/Kayjz/Kaygez/v3/internal/database/model"
+	"github.com/Kayjz/Kaygez/v3/internal/logger"
+	"github.com/Kayjz/Kaygez/v3/internal/web/runtime"
+	"github.com/Kayjz/Kaygez/v3/internal/web/service"
 )
 
 func (j *NodeTrafficSyncJob) clientActivityCursors(

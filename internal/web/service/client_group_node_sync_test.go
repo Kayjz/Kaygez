@@ -5,9 +5,9 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/runtime"
+	"github.com/Kayjz/Kaygez/v3/internal/database"
+	"github.com/Kayjz/Kaygez/v3/internal/database/model"
+	"github.com/Kayjz/Kaygez/v3/internal/web/runtime"
 )
 
 func TestSetRemoteTraffic_PreservesPanelLocalGroupAndComment(t *testing.T) {

@@ -1,9 +1,9 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "HEIMDALL Panel API",
+    "title": "KAYGEZ Panel API",
     "version": "3.x",
-    "description": "Programmatic interface to a HEIMDALL panel. Most protected APIs accept either a browser session cookie or an API token from Settings → Security → API Token. Operations marked browser-session-only reject Bearer tokens. Treat every API token like a panel password."
+    "description": "Programmatic interface to a KAYGEZ panel. Most protected APIs accept either a browser session cookie or an API token from Settings → Security → API Token. Operations marked browser-session-only reject Bearer tokens. Treat every API token like a panel password."
   },
   "servers": [
     {
@@ -21,7 +21,7 @@
       "cookieAuth": {
         "type": "apiKey",
         "in": "cookie",
-        "name": "heimdall",
+        "name": "kaygez",
         "description": "Session cookie set by POST /login. Browser-only."
       }
     },
@@ -2144,7 +2144,7 @@
         "type": "object"
       },
       "Node": {
-        "description": "Node represents a remote 3x-ui panel registered with the central panel.\nThe central panel polls each node's existing /panel/api/server/status\nendpoint over HTTP using the per-node ApiToken to populate the runtime\nstatus fields below.",
+        "description": "Node represents a remote Kaygez panel registered with the central panel.\nThe central panel polls each node's existing /panel/api/server/status\nendpoint over HTTP using the per-node ApiToken to populate the runtime\nstatus fields below.",
         "properties": {
           "activeCount": {
             "example": 23,
@@ -2585,7 +2585,7 @@
         "type": "object"
       },
       "Setting": {
-        "description": "Setting stores key-value configuration settings for the 3x-ui panel.",
+        "description": "Setting stores key-value configuration settings for the Kaygez panel.",
         "properties": {
           "id": {
             "type": "integer"
@@ -2605,7 +2605,7 @@
         "type": "object"
       },
       "User": {
-        "description": "User represents an administrator account in the Heimdall panel.",
+        "description": "User represents an administrator account in the Kaygez panel.",
         "properties": {
           "createdAt": {
             "format": "int64",
@@ -2781,15 +2781,15 @@
     },
     {
       "name": "Admins",
-      "description": "Manage Heimdall panel administrator accounts from an active browser session. Bearer API tokens are rejected. Access follows administrator RBAC permissions, and password hashes are never returned."
+      "description": "Manage Kaygez panel administrator accounts from an active browser session. Bearer API tokens are rejected. Access follows administrator RBAC permissions, and password hashes are never returned."
     },
     {
       "name": "Admin Roles",
-      "description": "Manage Heimdall dashboard roles and RBAC presets from an active browser session. Bearer API tokens are rejected. Access follows role-management RBAC permissions; built-in and owner roles retain their backend protections."
+      "description": "Manage Kaygez dashboard roles and RBAC presets from an active browser session. Bearer API tokens are rejected. Access follows role-management RBAC permissions; built-in and owner roles retain their backend protections."
     },
     {
       "name": "Nodes",
-      "description": "Manage remote HEIMDALL panels acting as nodes for a central panel. All endpoints under /panel/api/nodes."
+      "description": "Manage remote Kaygez panels acting as nodes for a central panel. All endpoints under /panel/api/nodes."
     },
     {
       "name": "Hosts",
@@ -4455,7 +4455,7 @@
         "tags": [
           "Server"
         ],
-        "summary": "Check whether a newer HEIMDALL release is available on GitHub.",
+        "summary": "Check whether a newer Kaygez release is available on GitHub.",
         "operationId": "get_panel_api_server_getPanelUpdateInfo",
         "responses": {
           "200": {
@@ -4872,6 +4872,69 @@
                       }
                     ]
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/panel/api/server/installXray/{version}": {
+      "post": {
+        "tags": [
+          "Server"
+        ],
+        "summary": "Download and install an official XTLS/Xray-core release as the panel core, then restart Xray. The version must be a vMAJOR.MINOR.PATCH tag.",
+        "operationId": "post_panel_api_server_installXray_version",
+        "parameters": [
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "description": "Release tag to install (e.g. v26.6.22).",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "msg": {
+                      "type": "string"
+                    },
+                    "obj": {}
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "success": {
+                      "type": "boolean"
+                    },
+                    "msg": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "example": {
+                  "success": false,
+                  "msg": "invalid Xray version ..."
                 }
               }
             }
@@ -11856,7 +11919,7 @@
         "tags": [
           "Settings"
         ],
-        "summary": "Restart the entire HEIMDALL process after a 3-second grace period. The connection drops immediately; the panel comes back online ~5-10 seconds later.",
+        "summary": "Restart the entire Kaygez process after a 3-second grace period. The connection drops immediately; the panel comes back online ~5-10 seconds later.",
         "operationId": "post_panel_api_setting_restartPanel",
         "responses": {
           "200": {

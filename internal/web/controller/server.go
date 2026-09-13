@@ -8,13 +8,13 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/entity"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/global"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service/panel"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/websocket"
+	"github.com/Kayjz/Kaygez/v3/internal/database/model"
+	"github.com/Kayjz/Kaygez/v3/internal/logger"
+	"github.com/Kayjz/Kaygez/v3/internal/web/entity"
+	"github.com/Kayjz/Kaygez/v3/internal/web/global"
+	"github.com/Kayjz/Kaygez/v3/internal/web/service"
+	"github.com/Kayjz/Kaygez/v3/internal/web/service/panel"
+	"github.com/Kayjz/Kaygez/v3/internal/web/websocket"
 
 	"github.com/gin-gonic/gin"
 )
@@ -64,6 +64,7 @@ func (a *ServerController) initRouter(g *gin.RouterGroup) {
 	g.GET("/getNewVlessEnc", a.getNewVlessEnc)
 	g.GET("/clientIps", a.getClientIps)
 
+	g.POST("/installXray/:version", a.installXray)
 	g.POST("/stopXrayService", a.stopXrayService)
 	g.POST("/restartXrayService", a.restartXrayService)
 	g.POST("/updatePanel", a.updatePanel)
@@ -195,15 +196,19 @@ func (a *ServerController) getPanelUpdateInfo(c *gin.Context) {
 	jsonObj(c, info, nil)
 }
 
-// installXray is intentionally disabled in Kaygez.
-// Kaygez ships a pinned, verified core build; this endpoint must not install
-// vanilla Xray releases from XTLS/Xray-core.
+var xrayVersionRegex = regexp.MustCompile(`^v[0-9]+\.[0-9]+\.[0-9]+$`)
+
+// installXray downloads and installs an official XTLS/Xray-core release as
+// this panel's core. The version comes from the :version route param and must
+// be a vMAJOR.MINOR.PATCH tag; anything else is rejected before any download.
 func (a *ServerController) installXray(c *gin.Context) {
-	jsonMsg(
-		c,
-		I18nWeb(c, "pages.index.xraySwitchVersionPopover"),
-		fmt.Errorf("Xray core updates are disabled in Kaygez; use the pinned Kaygez core release workflow"),
-	)
+	version := c.Param("version")
+	if !xrayVersionRegex.MatchString(version) {
+		jsonMsg(c, "invalid data", fmt.Errorf("invalid Xray version %q", version))
+		return
+	}
+	err := a.serverService.UpdateXray(version)
+	jsonMsg(c, I18nWeb(c, "pages.index.xraySwitchVersionPopover"), err)
 }
 
 // updatePanel starts a panel self-update. With no "dev" form value it follows

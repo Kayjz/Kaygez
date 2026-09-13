@@ -3,7 +3,7 @@ package controller
 import (
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/Kayjz/Kaygez/v3/internal/database/model"
 )
 
 func TestRoleAllowsPermissionViewGeneralAlias(t *testing.T) {

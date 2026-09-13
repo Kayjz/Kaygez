@@ -10,8 +10,8 @@ export interface InstallOptions {
   webBasePath: string;
 }
 
-const REPO_RAW = 'https://raw.githubusercontent.com/sh7CBAC/Heimdall/main/install.sh';
-const IMAGE = 'ghcr.io/sh7cbac/heimdall:latest';
+const REPO_RAW = 'https://raw.githubusercontent.com/Kayjz/Kaygez/main/install.sh';
+const IMAGE = 'ghcr.io/Kayjz/Kaygez:latest';
 
 function isLatest(version: string): boolean {
   const v = version.trim().toLowerCase();

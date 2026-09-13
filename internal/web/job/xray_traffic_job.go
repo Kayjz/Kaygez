@@ -3,11 +3,11 @@ package job
 import (
 	"encoding/json"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service/outbound"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/websocket"
-	"github.com/mhsanaei/3x-ui/v3/internal/xray"
+	"github.com/Kayjz/Kaygez/v3/internal/logger"
+	"github.com/Kayjz/Kaygez/v3/internal/web/service"
+	"github.com/Kayjz/Kaygez/v3/internal/web/service/outbound"
+	"github.com/Kayjz/Kaygez/v3/internal/web/websocket"
+	"github.com/Kayjz/Kaygez/v3/internal/xray"
 
 	"github.com/valyala/fasthttp"
 )

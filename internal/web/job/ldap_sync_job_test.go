@@ -4,9 +4,9 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
+	"github.com/Kayjz/Kaygez/v3/internal/database"
+	"github.com/Kayjz/Kaygez/v3/internal/database/model"
+	"github.com/Kayjz/Kaygez/v3/internal/web/service"
 )
 
 func initLdapJobDB(t *testing.T) {

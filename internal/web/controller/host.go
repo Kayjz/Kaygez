@@ -3,9 +3,9 @@ package controller
 import (
 	"strconv"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/web/entity"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/middleware"
-	"github.com/mhsanaei/3x-ui/v3/internal/web/service"
+	"github.com/Kayjz/Kaygez/v3/internal/web/entity"
+	"github.com/Kayjz/Kaygez/v3/internal/web/middleware"
+	"github.com/Kayjz/Kaygez/v3/internal/web/service"
 
 	"github.com/gin-gonic/gin"
 )

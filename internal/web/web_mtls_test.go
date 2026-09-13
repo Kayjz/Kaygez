@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"testing"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/util/crypto"
+	"github.com/Kayjz/Kaygez/v3/internal/util/crypto"
 )
 
 // TestPanelTLSAcceptsClientWithoutClientCert characterizes the invariant the

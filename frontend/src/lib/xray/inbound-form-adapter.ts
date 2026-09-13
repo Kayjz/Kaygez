@@ -112,7 +112,7 @@ function coerceShareAddrStrategy(v: unknown): ShareAddrStrategy {
 function coerceUsageMultiplier(v: unknown): number {
   const n = Number(v);
   if (!Number.isFinite(n)) return 1;
-  return Math.min(10, Math.max(1, Math.round(n * 100) / 100));
+  return Math.max(1, Math.round(n * 100) / 100);
 }
 
 // Network values that map to a required `${network}Settings` key in

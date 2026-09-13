@@ -8,8 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/Kayjz/Kaygez/v3/internal/database"
+	"github.com/Kayjz/Kaygez/v3/internal/database/model"
 )
 
 func setupClientCreateFanoutDB(t *testing.T) {
@@ -162,8 +162,8 @@ func clientFanoutMedian(values []time.Duration) time.Duration {
 }
 
 func TestCreateFanoutScaleDiagnostic(t *testing.T) {
-	if os.Getenv("HEIMDALL_RUN_PERF_DIAGNOSTIC") != "1" {
-		t.Skip("set HEIMDALL_RUN_PERF_DIAGNOSTIC=1 to run")
+	if os.Getenv("KAYGEZ_RUN_PERF_DIAGNOSTIC") != "1" {
+		t.Skip("set KAYGEZ_RUN_PERF_DIAGNOSTIC=1 to run")
 	}
 
 	const repetitions = 3

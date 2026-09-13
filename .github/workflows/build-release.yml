@@ -12,6 +12,13 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - goarch: amd64
+            xray_arch: 64
+          - goarch: arm64
+            xray_arch: arm64-v8a
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -19,7 +26,8 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.22"
+          go-version-file: go.mod
+          check-latest: true
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -32,54 +40,74 @@ jobs:
           npm install
           npm run build
 
-      - name: Build Backend (amd64)
+      - name: Build Backend
         run: |
-          GOOS=linux GOARCH=amd64 go build -o x-ui-linux-amd64 -ldflags="-s -w" main.go
+          CGO_ENABLED=1 GOOS=linux GOARCH=${{ matrix.goarch }} \
+            go build -trimpath -ldflags="-s -w" -o x-ui-linux-${{ matrix.goarch }} main.go
 
-      - name: Build Backend (arm64)
+      - name: Download official Xray core
         run: |
-          GOOS=linux GOARCH=arm64 go build -o x-ui-linux-arm64 -ldflags="-s -w" main.go
+          set -euo pipefail
+          XRAY_TAG="v26.6.22"
+          mkdir -p bin
+          curl -fL --retry 5 --retry-delay 3 -o /tmp/xray.zip \
+            "https://github.com/XTLS/Xray-core/releases/download/${XRAY_TAG}/Xray-linux-${{ matrix.xray_arch }}.zip"
+          curl -fL --retry 5 --retry-delay 3 -o /tmp/xray.zip.dgst \
+            "https://github.com/XTLS/Xray-core/releases/download/${XRAY_TAG}/Xray-linux-${{ matrix.xray_arch }}.zip.dgst"
+          EXPECTED="$(grep -i '^SHA2-256=' /tmp/xray.zip.dgst | head -n1 | cut -d= -f2 | tr -d '[:space:]')"
+          ACTUAL="$(sha256sum /tmp/xray.zip | awk '{print $1}')"
+          test -n "$EXPECTED"
+          test "$EXPECTED" = "$ACTUAL"
+          unzip -j /tmp/xray.zip -d bin
+          mv "bin/xray" "bin/xray-linux-${{ matrix.goarch }}"
+          chmod +x "bin/xray-linux-${{ matrix.goarch }}"
+          curl -fL --retry 5 --retry-delay 3 -o bin/geoip.dat \
+            "https://github.com/v2fly/geoip/releases/latest/download/geoip.dat"
+          curl -fL --retry 5 --retry-delay 3 -o bin/geosite.dat \
+            "https://github.com/v2fly/domain-list-community/releases/latest/download/dlc.dat"
 
-      - name: Package amd64
+      - name: Validate Xray binary
         run: |
-          mkdir -p x-ui
-          cp x-ui-linux-amd64 x-ui/x-ui
-          chmod +x x-ui/x-ui
-          cp x-ui.sh x-ui/
-          chmod +x x-ui/x-ui.sh
-          cp x-ui.service.debian x-ui/ || true
-          cp x-ui.service.arch x-ui/ || true
-          cp x-ui.service.rhel x-ui/ || true
-          tar -czf x-ui-linux-amd64.tar.gz x-ui
+          set -euo pipefail
+          test -x "bin/xray-linux-${{ matrix.goarch }}" || (echo "missing xray binary" && exit 1)
+          file "bin/xray-linux-${{ matrix.goarch }}"
 
-      - name: Package arm64
+      - name: Package
         run: |
-          rm -rf x-ui
-          mkdir -p x-ui
-          cp x-ui-linux-arm64 x-ui/x-ui
-          chmod +x x-ui/x-ui
-          cp x-ui.sh x-ui/
-          chmod +x x-ui/x-ui.sh
-          cp x-ui.service.debian x-ui/ || true
-          cp x-ui.service.arch x-ui/ || true
-          cp x-ui.service.rhel x-ui/ || true
-          tar -czf x-ui-linux-arm64.tar.gz x-ui
-
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: |
-            x-ui-linux-amd64.tar.gz
-            x-ui-linux-arm64.tar.gz
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          set -euo pipefail
+          rm -rf pkg
+          mkdir -p pkg/x-ui/bin
+          cp x-ui-linux-${{ matrix.goarch }} pkg/x-ui/x-ui
+          cp x-ui.sh pkg/x-ui/
+          cp x-ui.service.debian pkg/x-ui/ || true
+          cp x-ui.service.arch pkg/x-ui/ || true
+          cp x-ui.service.rhel pkg/x-ui/ || true
+          cp -r bin/. pkg/x-ui/bin/
+          chmod +x pkg/x-ui/x-ui pkg/x-ui/x-ui.sh
+          tar -C pkg -czf x-ui-linux-${{ matrix.goarch }}.tar.gz x-ui
 
       - name: Upload artifacts (manual trigger)
         if: github.event_name == 'workflow_dispatch'
         uses: actions/upload-artifact@v4
         with:
-          name: kaygez-binaries
-          path: |
-            x-ui-linux-amd64.tar.gz
-            x-ui-linux-arm64.tar.gz
+          name: kaygez-binaries-${{ matrix.goarch }}
+          path: x-ui-linux-${{ matrix.goarch }}.tar.gz
+
+  release:
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          pattern: kaygez-binaries-*
+          merge-multiple: true
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/*.tar.gz
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

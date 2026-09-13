@@ -1,6 +1,7 @@
 package service
 
 import (
+	"archive/zip"
 	"bufio"
 	"bytes"
 	"context"
@@ -26,12 +27,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/config"
-	"github.com/mhsanaei/3x-ui/v3/internal/database"
-	"github.com/mhsanaei/3x-ui/v3/internal/logger"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/common"
-	"github.com/mhsanaei/3x-ui/v3/internal/util/sys"
-	"github.com/mhsanaei/3x-ui/v3/internal/xray"
+	"github.com/Kayjz/Kaygez/v3/internal/config"
+	"github.com/Kayjz/Kaygez/v3/internal/database"
+	"github.com/Kayjz/Kaygez/v3/internal/logger"
+	"github.com/Kayjz/Kaygez/v3/internal/util/common"
+	"github.com/Kayjz/Kaygez/v3/internal/util/sys"
+	"github.com/Kayjz/Kaygez/v3/internal/xray"
 
 	"github.com/google/uuid"
 	utls "github.com/refraction-networking/utls"
@@ -931,8 +932,88 @@ func parseXrayDigestSHA256(dgst []byte) (string, error) {
 	return "", fmt.Errorf("xray checksum: no SHA2-256 entry in digest")
 }
 
+// UpdateXray downloads the given official XTLS/Xray-core release and installs
+// it as this panel's core, then restarts Xray. The running binary is only
+// replaced after the archive has been verified against the published SHA-256.
 func (s *ServerService) UpdateXray(version string) error {
-	return fmt.Errorf("Heimdall uses a custom Xray Core; changing the Xray Core from the panel/API is disabled to preserve Speed & Connection Limit features")
+	archivePath, err := s.downloadXRay(version)
+	if err != nil {
+		return err
+	}
+	defer os.Remove(archivePath)
+
+	binFolder := config.GetBinFolderPath()
+	if err := os.MkdirAll(binFolder, 0o755); err != nil {
+		return common.NewErrorf("failed to prepare bin folder: %v", err)
+	}
+
+	if err := installXrayFromArchive(archivePath, binFolder); err != nil {
+		return err
+	}
+
+	if err := s.RestartXrayService(); err != nil {
+		return common.NewErrorf("installed Xray %s but failed to restart: %v", version, err)
+	}
+	return nil
+}
+
+// installXrayFromArchive extracts the Xray binary from a downloaded release
+// zip and atomically replaces the installed core at binFolder/<binary name>.
+func installXrayFromArchive(archivePath string, binFolder string) error {
+	reader, err := zip.OpenReader(archivePath)
+	if err != nil {
+		return common.NewErrorf("open xray archive: %v", err)
+	}
+	defer reader.Close()
+
+	wantName := xray.GetBinaryName()
+	var src io.ReadCloser
+	for _, file := range reader.File {
+		if filepath.Base(file.Name) != wantName {
+			continue
+		}
+		src, err = file.Open()
+		if err != nil {
+			return common.NewErrorf("open %s in archive: %v", wantName, err)
+		}
+		break
+	}
+	if src == nil {
+		return common.NewErrorf("xray archive does not contain %s", wantName)
+	}
+	defer src.Close()
+
+	destPath := filepath.Join(binFolder, wantName)
+	tmp, err := os.CreateTemp(binFolder, "xray-install-*")
+	if err != nil {
+		return common.NewErrorf("create temp xray binary: %v", err)
+	}
+	tmpPath := tmp.Name()
+	ok := false
+	defer func() {
+		_ = tmp.Close()
+		if !ok {
+			_ = os.Remove(tmpPath)
+		}
+	}()
+
+	if _, err := io.Copy(tmp, src); err != nil {
+		return common.NewErrorf("write xray binary: %v", err)
+	}
+	if err := tmp.Sync(); err != nil {
+		return common.NewErrorf("sync xray binary: %v", err)
+	}
+	if err := tmp.Close(); err != nil {
+		return common.NewErrorf("close xray binary: %v", err)
+	}
+	if err := os.Chmod(tmpPath, 0o755); err != nil {
+		return common.NewErrorf("chmod xray binary: %v", err)
+	}
+	if err := os.Rename(tmpPath, destPath); err != nil {
+		return common.NewErrorf("replace xray binary: %v", err)
+	}
+	ok = true
+	return nil
 }
 
 func (s *ServerService) GetLogs(count string, level string, syslog string) []string {

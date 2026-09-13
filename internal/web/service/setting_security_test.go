@@ -6,8 +6,8 @@ import (
 
 	"github.com/xlzd/gotp"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database"
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
+	"github.com/Kayjz/Kaygez/v3/internal/database"
+	"github.com/Kayjz/Kaygez/v3/internal/database/model"
 )
 
 func setupSettingTestDB(t *testing.T) {

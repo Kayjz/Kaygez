@@ -10,10 +10,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/mhsanaei/3x-ui/v3/internal/database/model"
-	"github.com/mhsanaei/3x-ui/v3/internal/frontmux"
-	"github.com/mhsanaei/3x-ui/v3/internal/profilevalidation"
-	"github.com/mhsanaei/3x-ui/v3/internal/xray"
+	"github.com/Kayjz/Kaygez/v3/internal/database/model"
+	"github.com/Kayjz/Kaygez/v3/internal/frontmux"
+	"github.com/Kayjz/Kaygez/v3/internal/profilevalidation"
+	"github.com/Kayjz/Kaygez/v3/internal/xray"
 )
 
 const (

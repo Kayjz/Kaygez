@@ -4,16 +4,15 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
-	"strings"
 	"testing"
 
 	"github.com/gin-gonic/gin"
 	"github.com/op/go-logging"
 
-	xuilogger "github.com/mhsanaei/3x-ui/v3/internal/logger"
+	xuilogger "github.com/Kayjz/Kaygez/v3/internal/logger"
 )
 
-func TestServerControllerInstallXrayDisabledForKaygez(t *testing.T) {
+func TestServerControllerInstallXrayRegistersRoute(t *testing.T) {
 	xuilogger.InitLogger(logging.ERROR)
 	gin.SetMode(gin.TestMode)
 
@@ -21,7 +20,7 @@ func TestServerControllerInstallXrayDisabledForKaygez(t *testing.T) {
 	controller := &ServerController{}
 	router.POST("/server/installXray/:version", controller.installXray)
 
-	req := httptest.NewRequest(http.MethodPost, "/server/installXray/v26.6.22", nil)
+	req := httptest.NewRequest(http.MethodPost, "/server/installXray/not-a-version", nil)
 	rec := httptest.NewRecorder()
 	router.ServeHTTP(rec, req)
 
@@ -30,19 +29,13 @@ func TestServerControllerInstallXrayDisabledForKaygez(t *testing.T) {
 	}
 
 	var envelope struct {
-		Success bool   `json:"success"`
-		Msg     string `json:"msg"`
+		Success bool `json:"success"`
 	}
 	if err := json.Unmarshal(rec.Body.Bytes(), &envelope); err != nil {
 		t.Fatalf("decode response: %v; body=%s", err, rec.Body.String())
 	}
 
 	if envelope.Success {
-		t.Fatalf("installXray response success = true, want false; body=%s", rec.Body.String())
-	}
-
-	if !strings.Contains(strings.ToLower(envelope.Msg), "kaygez") ||
-		!strings.Contains(strings.ToLower(envelope.Msg), "disabled") {
-		t.Fatalf("response msg = %q, want Kaygez disabled message", envelope.Msg)
+		t.Fatalf("installXray accepted an invalid version; body=%s", rec.Body.String())
 	}
 }

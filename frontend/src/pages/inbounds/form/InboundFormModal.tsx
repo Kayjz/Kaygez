@@ -656,7 +656,7 @@ export default function InboundFormModal({
         name="usageMultiplier"
         label={labelWithHint(t('pages.inbounds.usageMultiplier'), t('pages.inbounds.usageMultiplierHelp'))}
       >
-        <InputNumber min={1} max={10} step={0.25} />
+        <InputNumber min={1} step={0.25} />
       </FormField>
 
       <FormField
