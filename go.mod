@@ -24,7 +24,7 @@ require (
 	github.com/xtls/xray-core v1.260327.1-0.20260711155151-50231eaff98c
 	go.uber.org/atomic v1.11.0
 	golang.org/x/crypto v0.54.0
-	golang.org/x/sys v0.47.0
+	golang.org/x/sys v0.48.0
 	golang.org/x/text v0.40.0
 	google.golang.org/grpc v1.82.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
