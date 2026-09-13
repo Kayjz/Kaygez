@@ -1484,7 +1484,7 @@ install_x-ui() {
     fi
 
     # Extract resources and set permissions
-    echo -e "${green}Extracting EP package...${plain}"
+    echo -e "${green}Extracting Kaygez package...${plain}"
     tar zxf x-ui-linux-$(arch).tar.gz
     if [[ $? -ne 0 ]]; then
         rm x-ui-linux-$(arch).tar.gz -f

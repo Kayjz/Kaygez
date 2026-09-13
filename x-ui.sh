@@ -2973,7 +2973,7 @@ show_usage() {
 show_menu() {
     echo -e "
 ┌────────────────────────────────────────────────┐
-│  ${green}EP Panel Management Script${plain}                    │
+│  ${green}Kaygez Panel Management Script${plain}                │
 │  ${green}0.${plain} Exit Script                                │
 ├────────────────────────────────────────────────┤
 │  ${green}1.${plain} Install                                    │
