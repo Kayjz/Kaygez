@@ -43,10 +43,19 @@ jobs:
       - name: Tidy Go modules
         run: go mod tidy
 
+      - name: Install arm64 cross-compiler
+        if: matrix.goarch == 'arm64'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
+
       - name: Build Backend
         run: |
+          if [ "${{ matrix.goarch }}" = "arm64" ]; then
+            export CC=aarch64-linux-gnu-gcc
+          fi
           CGO_ENABLED=1 GOOS=linux GOARCH=${{ matrix.goarch }} \
-            go build -trimpath -ldflags="-s -w" -o x-ui-linux-${{ matrix.goarch }} main.go
+            go build -v -trimpath -ldflags="-s -w" -o x-ui-linux-${{ matrix.goarch }} main.go 2>&1
 
       - name: Download official Xray core
         run: |
