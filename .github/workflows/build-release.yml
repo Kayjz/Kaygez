@@ -40,6 +40,9 @@ jobs:
           npm install
           npm run build
 
+      - name: Tidy Go modules
+        run: go mod tidy
+
       - name: Build Backend
         run: |
           CGO_ENABLED=1 GOOS=linux GOARCH=${{ matrix.goarch }} \
